@@ -1,0 +1,10 @@
+packages/*
+obj/*
+bin/*
+bin/debug/*
+.vs/*
+config.json
+obj
+bin
+.vs
+.idea
