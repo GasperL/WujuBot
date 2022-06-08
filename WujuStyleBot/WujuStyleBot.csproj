@@ -262,9 +262,12 @@
         <Compile Include="BotServices\Event\Events\BaseEvent.cs" />
         <Compile Include="BotServices\Event\Events\DeferredEvent.cs" />
         <Compile Include="BotServices\Event\IEventService.cs" />
-        <Compile Include="Logger\ConsoleLogger.cs" />
-        <Compile Include="Logger\ILogger.cs" />
-        <Compile Include="Logger\Logger.cs" />
+        <Compile Include="BotServices\Logger\ConsoleLogger.cs" />
+        <Compile Include="BotServices\Logger\ILogger.cs" />
+        <Compile Include="BotServices\Logger\Logger.cs" />
+        <Compile Include="BotServices\WujuVoice\IQuoteVoiceService.cs" />
+        <Compile Include="BotServices\WujuVoice\VoiceService.cs" />
+        <Compile Include="BotServices\WujuVoice\QuoteVoiceService.cs" />
         <Compile Include="Modules\WujuSlashCommands.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

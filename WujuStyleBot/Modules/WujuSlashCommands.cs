@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Audio;
@@ -7,6 +6,7 @@ using Discord.Interactions;
 using WujuStyleBot.BotServices.Command;
 using WujuStyleBot.BotServices.Event;
 using WujuStyleBot.BotServices.Event.Events;
+using WujuStyleBot.BotServices.WujuVoice;
 
 namespace WujuStyleBot.Modules
 {
@@ -14,79 +14,67 @@ namespace WujuStyleBot.Modules
     {
         public InteractionService Commands { get; set; }
         private CommandInteractionHandler _interactionHandler;
-        private readonly IEventService _eventService;
+        private readonly IQuoteVoiceService _quoteVoiceService;
 
         public WujuSlashCommands(
             CommandInteractionHandler interactionHandler,
-            IEventService eventService)
+            IQuoteVoiceService quoteVoiceService)
         {
             _interactionHandler = interactionHandler;
-            _eventService = eventService;
+            _quoteVoiceService = quoteVoiceService;
         }
 
-        [SlashCommand("событиее", "назначить событие")]
-        private async Task WujuEventHandler(string name, string date)
+        
+        [SlashCommand("цитата", "случайная цитата Мастера Йи")]
+        private async Task WujuRandomQuote()
         {
-            await _eventService.RegisterEvent(new DeferredEvent
-            {
-                Name = name,
-                StartAt = DateTime.Parse(date),
-                DiscordInteraction = Context.Interaction
-            });
-
-            _eventService.Start();
-
-            await RespondAsync($" Событие {name} началось");
+            await _quoteVoiceService
+                .RandomQuote(
+                    await GetAudioClient(), GetUserChannel());
         }
-
+        
+        [SlashCommand("наставление", "наставление от Мастера Йи")]
+        private async Task WujuWiseQuote()
+        {
+            await _quoteVoiceService
+                .RandomWiseQuote(
+                    await GetAudioClient(), GetUserChannel());
+        }
+        
+        [SlashCommand("смех", "смех Мастера")]
+        private async Task WujuLaugh()
+        {
+            await _quoteVoiceService
+                .WujuLaugh(
+                    await GetAudioClient(), GetUserChannel());
+        }
 
         [SlashCommand("вуджу", "призвать вуджу в войс", runMode: RunMode.Async)]
-        public async Task JoinChannel()
+        public async Task WujuJoinChannel()
         {
-            var channel = (Context.User as IGuildUser)?.VoiceChannel;
-
+            var channel = GetUserChannel();
+            
             if (channel == null)
             {
                 await Context.Channel
                     .SendMessageAsync
-                        ("ВРОДЕ БЫ УЧЕНИК НО ДОГАДАЛСЯ ЗАЙТИ В ВОЙС СНАЧАЛА?");
-                return;
+                        ("ВРОДЕ БЫ УЧЕНИК НО СНАЧАЛА НЕ ДОГАДАЛСЯ В ВОЙС ЗАЙТИ?");
             }
             
+            var audioClient = await GetAudioClient();
             
-            var audioClient = await channel.ConnectAsync(selfDeaf: true);
-            
-            await SendAsync(audioClient, "C:\\Users\\User\\Music\\ПАСТУХ - Я УМИРАТЬ.mp3", channel);
+            await _quoteVoiceService
+                .SummonWuju(audioClient, channel);
         }
 
-        private Process CreateStream(string path)
+        private async Task<IAudioClient> GetAudioClient()
         {
-            var process =  Process.Start(new ProcessStartInfo
-            {
-                FileName = "ffmpeg.exe",
-                Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            });
-            
-            return process;
+              return await GetUserChannel().ConnectAsync(selfDeaf: true);
         }
-        
-        private async Task SendAsync(IAudioClient client, string path, IVoiceChannel channel)
+
+        private IVoiceChannel GetUserChannel()
         {
-            using var ffmpeg = CreateStream(path);
-            using var output = ffmpeg.StandardOutput.BaseStream;
-            using var discord = client.CreatePCMStream(AudioApplication.Mixed);
-        
-            try
-            {
-                await output.CopyToAsync(discord);
-            }
-            finally
-            {
-                await discord.FlushAsync();
-                await channel.DisconnectAsync();
-            }
+            return (Context.User as IGuildUser)?.VoiceChannel;
         }
     }
 }

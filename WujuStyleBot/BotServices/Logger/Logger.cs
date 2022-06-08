@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Discord;
 
-namespace WujuStyleBot.Logger
+namespace WujuStyleBot.BotServices.Logger
 {
     public abstract class Logger : ILogger
     {

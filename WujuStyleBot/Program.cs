@@ -9,7 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WujuStyleBot.BotServices.Command;
 using WujuStyleBot.BotServices.Event;
-using WujuStyleBot.Logger;
+using WujuStyleBot.BotServices.Logger;
+using WujuStyleBot.BotServices.WujuVoice;
 
 namespace WujuStyleBot
 {
@@ -47,7 +48,7 @@ namespace WujuStyleBot
                             LogLevel = LogSeverity.Debug,
                             DefaultRunMode = Discord.Commands.RunMode.Async
                         }))
-                        .AddSingleton<IEventService, EventService>()
+                        .AddSingleton<IQuoteVoiceService, QuoteVoiceService>()
                         .AddSingleton<SocketSlashCommand>())
                 .Build());
         }
