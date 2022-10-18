@@ -2,12 +2,15 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Audio;
+using Discord.Interactions;
 
 namespace WujuStyleBot.BotServices.WujuVoice
 {
     public static class VoiceService
     {
-        public static async Task SendAsync(IAudioClient client, IVoiceChannel channel, string path)
+        public static async Task SendAsync(
+            IAudioClient client,
+            IVoiceChannel channel, string path)
         {
             using var ffmpeg = CreateStream(path);
             using var output = ffmpeg.StandardOutput.BaseStream;

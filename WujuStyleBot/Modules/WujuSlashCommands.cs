@@ -1,11 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Audio;
 using Discord.Interactions;
 using WujuStyleBot.BotServices.Command;
-using WujuStyleBot.BotServices.Event;
-using WujuStyleBot.BotServices.Event.Events;
 using WujuStyleBot.BotServices.WujuVoice;
 
 namespace WujuStyleBot.Modules
@@ -24,57 +21,73 @@ namespace WujuStyleBot.Modules
             _quoteVoiceService = quoteVoiceService;
         }
 
-        
+
         [SlashCommand("цитата", "случайная цитата Мастера Йи")]
         private async Task WujuRandomQuote()
         {
+            var userChannel = await GetUserChannelAsync();
+
             await _quoteVoiceService
                 .RandomQuote(
-                    await GetAudioClient(), GetUserChannel());
+                      await userChannel.ConnectAsync(selfDeaf: true), userChannel);
         }
-        
+
         [SlashCommand("наставление", "наставление от Мастера Йи")]
         private async Task WujuWiseQuote()
         {
-            await _quoteVoiceService
+            var userChannel = await GetUserChannelAsync();
+
+            var quote = await _quoteVoiceService
                 .RandomWiseQuote(
-                    await GetAudioClient(), GetUserChannel());
+                    await userChannel.ConnectAsync(selfDeaf: true), userChannel);
+
+            await Context.Interaction.FollowupAsync(quote);
         }
-        
+
         [SlashCommand("смех", "смех Мастера")]
         private async Task WujuLaugh()
         {
-            await _quoteVoiceService
+            var userChannel = await GetUserChannelAsync();
+
+            var quote = await _quoteVoiceService
                 .WujuLaugh(
-                    await GetAudioClient(), GetUserChannel());
+                   await userChannel.ConnectAsync(selfDeaf: true), userChannel);
+
+            await Context.Interaction.FollowupAsync(quote);
         }
 
         [SlashCommand("вуджу", "призвать вуджу в войс", runMode: RunMode.Async)]
-        public async Task WujuJoinChannel()
+        private async Task WujuSummonChannel()
         {
-            var channel = GetUserChannel();
-            
-            if (channel == null)
+            var userChannel = await GetUserChannelAsync();
+
+            var quote = await _quoteVoiceService
+               .SummonWuju(
+                   await userChannel.ConnectAsync(selfDeaf: true), userChannel);
+
+            await Context.Interaction.FollowupAsync(quote);
+        }
+
+        private async Task<IVoiceChannel> GetUserChannelAsync()
+        {
+            await RespondAsync("Думаю амм...");
+
+            var voiceChannel = (Context.User as IGuildUser)?.VoiceChannel;
+
+            return await VoiceChannelAssert(voiceChannel);
+        }
+
+        private async Task<IVoiceChannel> VoiceChannelAssert(IVoiceChannel voiceChannel)
+        {
+            if (voiceChannel == null)
             {
-                await Context.Channel
-                    .SendMessageAsync
-                        ("ВРОДЕ БЫ УЧЕНИК НО СНАЧАЛА НЕ ДОГАДАЛСЯ В ВОЙС ЗАЙТИ?");
+                await Context.Interaction
+                    .FollowupAsync("ААААА!!! ТЫ ТУПОЙ УЧЕНИК! ЗАЙДИ В ВОЙС СНАЧАЛА!!!");
+
+                throw new Exception("Voice channel doesen't exist.");
             }
-            
-            var audioClient = await GetAudioClient();
-            
-            await _quoteVoiceService
-                .SummonWuju(audioClient, channel);
-        }
 
-        private async Task<IAudioClient> GetAudioClient()
-        {
-              return await GetUserChannel().ConnectAsync(selfDeaf: true);
-        }
-
-        private IVoiceChannel GetUserChannel()
-        {
-            return (Context.User as IGuildUser)?.VoiceChannel;
+            return voiceChannel;
         }
     }
 }

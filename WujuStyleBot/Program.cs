@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WujuStyleBot.BotServices.Command;
-using WujuStyleBot.BotServices.Event;
 using WujuStyleBot.BotServices.Logger;
 using WujuStyleBot.BotServices.WujuVoice;
 
@@ -82,7 +81,6 @@ namespace WujuStyleBot
 
         private async Task RegisterEntryServices(IServiceProvider provider)
         {
-          
             _commands = provider.GetRequiredService<InteractionService>();
             _client = provider.GetRequiredService<DiscordSocketClient>();
             await provider.GetRequiredService<CommandInteractionHandler>().InitializeAsync();

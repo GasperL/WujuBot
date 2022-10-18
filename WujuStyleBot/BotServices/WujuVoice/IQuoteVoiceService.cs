@@ -1,18 +1,19 @@
 using System.Threading.Tasks;
 using Discord;
 using Discord.Audio;
+using Discord.Interactions;
 
 namespace WujuStyleBot.BotServices.WujuVoice
 {
     public interface IQuoteVoiceService
     {
-        Task RandomQuote(IAudioClient audioClient,  IVoiceChannel voiceChannel);
+        Task<string> RandomQuote(IAudioClient audioClient,  IVoiceChannel voiceChannel);
 
-        Task RandomWiseQuote(IAudioClient audioClient, IVoiceChannel voiceChannel);
+        Task<string> RandomWiseQuote(IAudioClient audioClient, IVoiceChannel voiceChannel);
 
-        Task SummonWuju(IAudioClient audioClient, IVoiceChannel voiceChannel);
+        Task<string> SummonWuju(IAudioClient audioClient, IVoiceChannel voiceChannel);
 
-        Task WujuLaugh(IAudioClient audioClient, IVoiceChannel voiceChannel);
+        Task<string> WujuLaugh(IAudioClient audioClient, IVoiceChannel voiceChannel);
     }
 }
 
